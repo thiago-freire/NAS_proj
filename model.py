@@ -3,6 +3,7 @@ from blocos import STEM, ResBlock, ResBlockAT, ResBlockUP, ResBlockUPAT, SegHEAD
 from torchinfo import summary
 
 class ResUNetAtt(nn.Module):
+    
     def __init__(self, blocks, layers, skips):
         super(ResUNetAtt, self).__init__()  
 
@@ -17,7 +18,7 @@ class ResUNetAtt(nn.Module):
         self.dec2 = self.__make_decoder(blocks[5], 128, layers[2], skips[1])
         self.dec3 = self.__make_decoder(blocks[6], 64, layers[1], skips[2])
         self.dec4 = self.__make_decoder(blocks[7], 32, layers[0], skips[3])
-        self.segHead = SegHEAD(32, 16, 1)
+        self.segHead = SegHEAD(32, 16, 2)
 
     def __make_encoder(self, block, out_channels, blocks, stride=1):
         
