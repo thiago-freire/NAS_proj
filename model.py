@@ -18,7 +18,7 @@ class ResUNetAtt(nn.Module):
         self.dec2 = self.__make_decoder(blocks[5], 128, layers[2], skips[1])
         self.dec3 = self.__make_decoder(blocks[6], 64, layers[1], skips[2])
         self.dec4 = self.__make_decoder(blocks[7], 32, layers[0], skips[3])
-        self.segHead = SegHEAD(32, 16, 1)
+        self.segHead = SegHEAD(32, 16, 2)
 
     def __make_encoder(self, block, out_channels, blocks, stride=1):
         
@@ -88,9 +88,9 @@ class ResUNetAtt(nn.Module):
 if __name__ == "__main__":
 
     blocks = ['AT', 'AT', 'AT', 'NT', 'AT', 'NT', 'AT', 'NT']
-    layers = [2,3,3,5]
+    layers = [5,5,5,5]
     skip = [True, False, True, False]
     model = ResUNetAtt(blocks=blocks, layers=layers, skips=skip)
     model.to(device='cuda')
 
-    summary(model, (30, 3, 256, 256), device='cuda', depth=2)
+    summary(model, (80, 3, 256, 256), device='cuda', depth=2)

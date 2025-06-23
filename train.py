@@ -70,11 +70,11 @@ class Trainer():
 
             y_pred = self.model(x)
 
-            loss = loss_fn(y_pred, y[:,:,:,1])
-            # disc_loss = loss_fn(y_pred[:,0,:,:], y[:,:,:,1])
-            # cup_loss = loss_fn(y_pred[:,1,:,:], y[:,:,:,2])
+            # loss = loss_fn(y_pred, y[:,:,:,1])
+            disc_loss = loss_fn(y_pred[:,0,:,:], y[:,:,:,1])
+            cup_loss = loss_fn(y_pred[:,1,:,:], y[:,:,:,2])
 
-            # loss = self.alfa_class * disc_loss + (1-self.alfa_class) * cup_loss
+            loss = self.alfa_class * disc_loss + (1-self.alfa_class) * cup_loss
 
             loss.backward()
             optimizer.step()
@@ -97,11 +97,11 @@ class Trainer():
                 y = y.to(device)
 
                 y_pred = self.model(x)
-                loss = loss_fn(y_pred, y[:,:,:,1])
-                # disc_loss = loss_fn(y_pred[:,0,:,:], y[:,:,:,1])
-                # cup_loss = loss_fn(y_pred[:,1,:,:], y[:,:,:,2])
+                # loss = loss_fn(y_pred, y[:,:,:,1])
+                disc_loss = loss_fn(y_pred[:,0,:,:], y[:,:,:,1])
+                cup_loss = loss_fn(y_pred[:,1,:,:], y[:,:,:,2])
 
-                # loss = self.alfa_class * disc_loss + (1-self.alfa_class) * cup_loss
+                loss = self.alfa_class * disc_loss + (1-self.alfa_class) * cup_loss
 
                 epoch_loss += loss.item()
 

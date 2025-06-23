@@ -12,7 +12,7 @@ import optuna
 def model(blocks, layers, skips, alfa_loss = 0.5,
           epochs = 20, n_folds = 5, albu_scale=1):
 
-    lr = 1e-2
+    lr = 1e-3
     batch_size = 70
 
     modelDict = {'blocks':blocks,
@@ -118,9 +118,6 @@ def model(blocks, layers, skips, alfa_loss = 0.5,
 
 def objective(trial: optuna.Trial) -> float:
 
-    epochs = 20  
-    n_folds = 1
-
     albu_scale = trial.suggest_int("albumentations", 1, 4)
 
     alfa_loss = trial.suggest_float("alfa_loss", 0.4, 0.7)
@@ -140,7 +137,7 @@ def objective(trial: optuna.Trial) -> float:
         skip = trial.suggest_categorical(f"skip_{i+1}", [True, False])
         skips.append(skip)
 
-    dice_disc, dice_cup = model(blocks, layers, skips, alfa_loss, 
+    dice_disc, dice_cup = model(blocks, layers, skips, alfa_loss, epochs=100, 
                                 n_folds = 1, albu_scale = albu_scale)
     
     return dice_cup, dice_disc
@@ -152,27 +149,27 @@ def runOptuna():
     if create:
         study = optuna.create_study(
             # storage="postgresql://postgres:postgres@192.168.200.169/optuna_thiago",  # Specify the storage URL here.
-            storage="postgresql://postgres:123456@localhost/optuna",  # Specify the storage URL here.
+            storage="postgresql://postgres:postgres@192.168.200.169/optuna",  # Specify the storage URL here.
             study_name="Optimização do Modelo",
             directions=["maximize", "maximize"])
     else:
         study = optuna.load_study(
-            storage="postgresql://postgres:123456@localhost/optuna",  # Specify the storage URL here.
+            storage="postgresql://postgres:postgres@192.168.200.169/optuna",  # Specify the storage URL here.
             study_name="Optimização do Modelo")
     
-    study.optimize(objective, n_trials=12)
+    study.optimize(objective, n_trials=100)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    # runOptuna()
+    runOptuna()
     # model(k = 2, batch_size = 20, epochs = 50,  
     #       n_folds = 5, albu_scale = 2, 
     #       alfa_loss = 0.61)
 
-    blocks = ['AT', 'AT', 'AT', 'NT', 'NT', 'AT', 'AT', 'AT']
-    layers = [2,3,3,5]
-    skips = [True, True, True, True]
+    # blocks = ['AT', 'AT', 'AT', 'NT', 'NT', 'AT', 'AT', 'AT']
+    # layers = [2,3,3,5]
+    # skips = [True, True, True, True]
             
-    dice_disc, dice_cup = model(blocks, layers, skips, n_folds=1)
+    # dice_disc, dice_cup = model(blocks, layers, skips, n_folds=1)
     
