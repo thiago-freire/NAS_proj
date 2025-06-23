@@ -127,7 +127,7 @@ def objective(trial: optuna.Trial) -> float:
 
     blocks = []
     for i in range(8):
-        cate = trial.suggest_categorical(f"step_{i+1}", ["AT", "NT"])
+        cate = trial.suggest_categorical(f"step_{i+1}", ["AT", "NT", "C"])
         blocks.append(cate)
     
     layers = []
