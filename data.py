@@ -1,15 +1,11 @@
 import numpy as np
 import cv2
-import pandas as pd
 import torch
 from torch.utils.data import Dataset
-from utils import loadDataCL, loadDataClassify
-
+from utils import loadData
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
-
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 
 import torch.nn.functional as F
 
@@ -46,20 +42,10 @@ class DriveDataset(Dataset):
         original = idx % self.scale == 0
         index = idx//self.scale
 
-        # print(self.images_path[index], self.masks_path[index])
         image = cv2.imread(self.paths[index][0], cv2.IMREAD_COLOR)
-        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        # image = np.float32(image)
-        # image = image/255.0 ## (512, 512, 3)
-        # image = np.transpose(image, (2, 0, 1))  ## (3, 512, 512)
-        # image = image.astype(np.float32)
 
         """ Reading mask """
         mask = cv2.imread(self.paths[index][1], cv2.IMREAD_COLOR)
-        # mask = mask[:,:,1]
-        # mask = np.float32(mask)
-        # mask = mask/255.0 ## (512, 512, 3)
-        # mask = mask.astype(np.float32)
 
         if not original:
             transformed = transform(image=image, mask=mask)
@@ -86,13 +72,7 @@ class DallysonDriveDataset(Dataset):
         original = idx % self.scale == 0
         index = idx//self.scale
 
-        # print(self.images_path[index], self.masks_path[index])
         image = cv2.imread(self.paths[index][0], cv2.IMREAD_COLOR)
-        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        # image = np.float32(image)
-        # image = image/255.0 ## (512, 512, 3)
-        # image = np.transpose(image, (2, 0, 1))  ## (3, 512, 512)
-        # image = image.astype(np.float32)
 
         """ Reading mask """
         disc = cv2.imread(self.paths[index][1], cv2.IMREAD_GRAYSCALE)
@@ -111,19 +91,8 @@ class DallysonDriveDataset(Dataset):
 
         cup /= 255
 
-        # if disc.shape == cup.shape:
-        #     fundo = np.zeros(disc.shape)
         mask = cup + disc
-        # mask = np.float32(mask)
-        # mask = mask/255.0 ## (512, 512, 3)
-        # disc = np.expand_dims(disc, axis=2)
-        # cup = np.expand_dims(cup, axis=2)
-        # fundo = np.expand_dims(fundo, axis=2)
-        # mask = np.concatenate([fundo, disc, cup], axis=2)
 
-        # mask = mask/255
-
-        # print(f"Image shape = {image.shape}\tMask shape = {mask.shape}")
 
         if not original:
             transformed = transform(image=image, mask=mask)
@@ -131,7 +100,6 @@ class DallysonDriveDataset(Dataset):
             transformed = to_tensor(image=image, mask=mask)
             
         return transformed['image'].type(torch.FloatTensor), transformed['mask'].type(torch.FloatTensor)
-
 
     def __len__(self):
         return self.n_samples
@@ -202,24 +170,18 @@ class SegClassifyDataset(Dataset):
 
 if __name__ == '__main__':
 
-    base = 'C:/Projetos/Datasets/thiago.freire/'
+    base = '/backup/thiago.freire/Dataset/'
     
-    refuge_path = f"{base}REFUGE/"
+    refuge_path = f"{base}REFUGE/other/"
     origa_path = f"{base}ORIGA/"
 
-    origa, refuge = loadDataCL(origa_path, refuge_path)
+    origa, refuge = loadData(origa_path, refuge_path)
+
+    print(origa.shape, refuge.shape)
 
     train = np.concatenate([origa, refuge], axis=0)
 
-    dataset = SegClassifyDataset(train, 1)
-
-    # base = "E:/SGMD"
-        
-    # sgmd = loadDataClassify(base)
-
-    # print(len(sgmd))
- 
-    # dataset = ClassifyDataset(sgmd, 5)
+    dataset = DriveDataset(train, 1)
 
     train_loader = DataLoader(
                 dataset=dataset,
@@ -228,20 +190,26 @@ if __name__ == '__main__':
                 num_workers=2
             )
     
-    for x, y, l in train_loader:
+    # for x, y, l in train_loader:
 
-        print(f"X com shape = {x.shape}")
-        print(f"Y com shape = {y.shape}")
-        print(f"L = {l}")
-        break
-
-    # for x, y in train_loader:
     #     print(f"X com shape = {x.shape}")
-    #     print(f"Y com shape = {y}")
-
-
-    #     image, mask = x[0], y[0]
-    #     image = image.cpu().numpy()
-    #     image = image.transpose(1, 2, 0)
-    #     print(image.max(), mask)
+    #     print(f"Y com shape = {y.shape}")
+    #     print(f"L = {l}")
     #     break
+
+    i=0
+
+    for x, y in train_loader:
+        print(f"X com shape = {x.shape}")
+        print(f"Y com shape = {y}")
+
+
+        image, mask = x[0], y[0]
+        image = image.cpu().numpy()
+        image = image.transpose(1, 2, 0)
+        mask = mask.cpu().numpy()
+        mask *= 250
+        cv2.imwrite(filename=f"mask_{i}.png", img=mask)
+        i += 1
+        print(image.max(), mask)
+        break

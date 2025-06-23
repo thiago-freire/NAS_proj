@@ -5,10 +5,6 @@ import numpy as np
 import pandas as pd
 import torch
 from glob import glob
-from sklearn.model_selection import train_test_split
-#import seaborn as sn
-#import pandas as pd
-#import matplotlib.pyplot as plt
 
 def seeding(seed):
     random.seed(seed)

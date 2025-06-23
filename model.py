@@ -1,5 +1,5 @@
 import torch.nn as nn
-from blocos import STEM, ResBlock, ResBlockAT, ResBlockUP, ResBlockUPAT, SegHEAD
+from blocos import STEM, ConvBlock, ConvBlockUP, ResBlock, ResBlockAT, ResBlockUP, ResBlockUPAT, SegHEAD
 from torchinfo import summary
 
 class ResUNetAtt(nn.Module):
@@ -18,7 +18,7 @@ class ResUNetAtt(nn.Module):
         self.dec2 = self.__make_decoder(blocks[5], 128, layers[2], skips[1])
         self.dec3 = self.__make_decoder(blocks[6], 64, layers[1], skips[2])
         self.dec4 = self.__make_decoder(blocks[7], 32, layers[0], skips[3])
-        self.segHead = SegHEAD(32, 16, 2)
+        self.segHead = SegHEAD(32, 16, 1)
 
     def __make_encoder(self, block, out_channels, blocks, stride=1):
         
@@ -49,8 +49,10 @@ class ResUNetAtt(nn.Module):
         if self.in_channels != out_channels:
             if block == 'NT':
                 frist = ResBlockUP(self.in_channels, out_channels, skip)
-            else:
+            elif block == 'AT':
                 frist = ResBlockUPAT(self.in_channels, out_channels, skip)
+            else:
+                frist = ConvBlockUP(self.in_channels, out_channels, skip)
 
         self.in_channels = out_channels
         
@@ -58,8 +60,10 @@ class ResUNetAtt(nn.Module):
         for _ in range(1, blocks):
             if block == 'AT':
                 layers.append(ResBlockAT(out_channels, out_channels))
-            else:
+            elif block == 'NT':
                 layers.append(ResBlock(out_channels, out_channels))
+            else:
+                layers.append(ConvBlock(out_channels, out_channels))
         
         tail = nn.Sequential(*layers)
         

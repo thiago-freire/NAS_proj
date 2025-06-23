@@ -10,10 +10,10 @@ import optuna
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 def model(blocks, layers, skips, alfa_loss = 0.5,
-          epochs = 20, n_folds = 5, albu_scale=3):
+          epochs = 20, n_folds = 5, albu_scale=1):
 
-    lr = 1e-3
-    batch_size = 40
+    lr = 1e-2
+    batch_size = 70
 
     modelDict = {'blocks':blocks,
                  'layers':layers,
@@ -165,10 +165,14 @@ def runOptuna():
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    runOptuna()
+    # runOptuna()
     # model(k = 2, batch_size = 20, epochs = 50,  
     #       n_folds = 5, albu_scale = 2, 
     #       alfa_loss = 0.61)
+
+    blocks = ['AT', 'AT', 'AT', 'NT', 'NT', 'AT', 'AT', 'AT']
+    layers = [2,3,3,5]
+    skips = [True, True, True, True]
             
-    # iou_disc, iou_cup, dice_disc, dice_cup = model(n_folds=1)
+    dice_disc, dice_cup = model(blocks, layers, skips, n_folds=1)
     

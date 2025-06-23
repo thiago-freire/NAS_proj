@@ -5,9 +5,6 @@ from model import ResUNetAtt
 from utils import loadData
 from data import DriveDataset
 from torch.utils.data import DataLoader
-import numpy as np
-from typing import List
-from sklearn.model_selection import train_test_split
 
 class JaccardLossSigmoid(nn.Module):
     

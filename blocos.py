@@ -16,6 +16,34 @@ class STEM(nn.Module):
         x = self.maxpool(x)
         return x
 
+class SimAM(nn.Module):
+    
+    def __init__(self, channels = None, e_lambda = 1e-4):
+        super(SimAM, self).__init__()
+
+        self.activaton = nn.Sigmoid()
+        self.e_lambda = e_lambda
+
+    def __repr__(self):
+        s = self.__class__.__name__ + '('
+        s += ('lambda=%f)' % self.e_lambda)
+        return s
+
+    @staticmethod
+    def get_module_name():
+        return "SimAM"
+
+    def forward(self, x: torch.Tensor):
+
+        b, c, h, w = x.size()
+        
+        n = w * h - 1
+
+        x_minus_mu_square = (x - x.mean(dim=[2,3], keepdim=True)).pow(2)
+        y = x_minus_mu_square / (4 * (x_minus_mu_square.sum(dim=[2,3], keepdim=True) / n + self.e_lambda)) + 0.5
+
+        return x * self.activaton(y)
+    
 class ResBlock(nn.Module):
 
     def __init__(self, in_c, out_c, stride=1, downsample=None):
@@ -50,33 +78,33 @@ class ResBlock(nn.Module):
         
         return out
 
-class SimAM(nn.Module):
-    def __init__(self, channels = None, e_lambda = 1e-4):
-        super(SimAM, self).__init__()
+class ConvBlock(nn.Module):
 
-        self.activaton = nn.Sigmoid()
-        self.e_lambda = e_lambda
+    def __init__(self, in_c, out_c, stride=1):
+        super(ConvBlock, self).__init__()
 
-    def __repr__(self):
-        s = self.__class__.__name__ + '('
-        s += ('lambda=%f)' % self.e_lambda)
-        return s
+        self.conv1 = nn.Conv2d(in_c, out_c, kernel_size=3,
+                               stride=stride, padding=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(out_c)
+        
+        self.conv2 = nn.Conv2d(out_c, out_c, kernel_size=3,
+                               stride=1, padding=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(out_c)
 
-    @staticmethod
-    def get_module_name():
-        return "SimAM"
+        self.relu = nn.ReLU(inplace=True)
 
     def forward(self, x: torch.Tensor):
-
-        b, c, h, w = x.size()
         
-        n = w * h - 1
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.relu(out)
+        
+        out = self.conv2(out)
+        out = self.bn2(out)
+        out = self.relu(out)
+        
+        return out
 
-        x_minus_mu_square = (x - x.mean(dim=[2,3], keepdim=True)).pow(2)
-        y = x_minus_mu_square / (4 * (x_minus_mu_square.sum(dim=[2,3], keepdim=True) / n + self.e_lambda)) + 0.5
-
-        return x * self.activaton(y)
-    
 class ResBlockAT(nn.Module):
 
     def __init__(self, in_c, out_c, stride=1, downsample=None):
@@ -156,7 +184,43 @@ class ResBlockUP(nn.Module):
         out = self.relu(out)
         
         return out
-    
+
+class ConvBlockUP(nn.Module):
+
+    def __init__(self, in_c, out_c, skip):
+        super(ConvBlockUP, self).__init__()
+
+        self.conv1 = nn.ConvTranspose2d(in_c, out_c, kernel_size=2, stride=2, padding=0)
+        self.bn1 = nn.BatchNorm2d(out_c)
+        
+        self.conv2 = nn.Conv2d(out_c*2, out_c, kernel_size=3, stride=1, padding=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(out_c)        
+        self.relu = nn.ReLU(inplace=True)
+
+        self.hasSkip = skip
+
+
+        if skip:
+            self.skipBlock = SimAM()
+
+    def forward(self, x: torch.Tensor, skip: torch.Tensor):
+        
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.relu(out)
+
+        if self.hasSkip:
+            skip = self.skipBlock(skip)
+
+        out = torch.cat([out, skip], axis=1)
+        
+        out = self.conv2(out)
+        out = self.bn2(out)
+        
+        out = self.relu(out)
+        
+        return out
+
 class ResBlockUPAT(nn.Module):
 
     def __init__(self, in_c, out_c, skip):

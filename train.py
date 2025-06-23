@@ -3,7 +3,7 @@ import os
 
 import torch
 from torch.utils.data import DataLoader
-from torchsummary import summary
+from torchinfo import summary
 from data import DriveDataset
 from model import ResUNetAtt
 from loss import DiceBCELossSigmoid
@@ -42,8 +42,6 @@ class Trainer():
         self.train_dataset = DriveDataset(train, scale)
         self.valid_dataset = DriveDataset(validation, scale)
 
-        summary(self.model, (3, 256, 256), device='cuda', depth=3)
-
     def setHyperParam(self, lr, batch_size, epochs, alfa_loss, alfa_class):
 
         """ Hyperparameters """
@@ -52,6 +50,8 @@ class Trainer():
         self.num_epochs = epochs
         self.alfa_loss = alfa_loss
         self.alfa_class = alfa_class
+
+        summary(self.model, (self.batch_size, 3, 256, 256), device=self.device, depth=2)
 
     def train(self, loader: DataLoader, optimizer: torch.optim.Adam, 
               loss_fn: DiceBCELossSigmoid, device: torch.device):
@@ -70,10 +70,11 @@ class Trainer():
 
             y_pred = self.model(x)
 
-            disc_loss = loss_fn(y_pred[:,0,:,:], y[:,:,:,1])
-            cup_loss = loss_fn(y_pred[:,1,:,:], y[:,:,:,2])
+            loss = loss_fn(y_pred, y[:,:,:,1])
+            # disc_loss = loss_fn(y_pred[:,0,:,:], y[:,:,:,1])
+            # cup_loss = loss_fn(y_pred[:,1,:,:], y[:,:,:,2])
 
-            loss = self.alfa_class * disc_loss + (1-self.alfa_class) * cup_loss
+            # loss = self.alfa_class * disc_loss + (1-self.alfa_class) * cup_loss
 
             loss.backward()
             optimizer.step()
@@ -96,10 +97,11 @@ class Trainer():
                 y = y.to(device)
 
                 y_pred = self.model(x)
-                disc_loss = loss_fn(y_pred[:,0,:,:], y[:,:,:,1])
-                cup_loss = loss_fn(y_pred[:,1,:,:], y[:,:,:,2])
+                loss = loss_fn(y_pred, y[:,:,:,1])
+                # disc_loss = loss_fn(y_pred[:,0,:,:], y[:,:,:,1])
+                # cup_loss = loss_fn(y_pred[:,1,:,:], y[:,:,:,2])
 
-                loss = self.alfa_class * disc_loss + (1-self.alfa_class) * cup_loss
+                # loss = self.alfa_class * disc_loss + (1-self.alfa_class) * cup_loss
 
                 epoch_loss += loss.item()
 
@@ -172,4 +174,4 @@ class Trainer():
         if not os.path.isdir(f"{self.base_results}fold/fold_{self.fold}/lossGraf/"):
             os.mkdir(f"{self.base_results}fold/fold_{self.fold}/lossGraf/")
 
-        plt.savefig(f'{self.base_results}fold/fold_{self.fold}/lossGraf/grafico_k{self.k}.png', dpi=200)
+        plt.savefig(f'{self.base_results}fold/fold_{self.fold}/lossGraf/grafico.png', dpi=200)
