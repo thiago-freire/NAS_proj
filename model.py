@@ -93,4 +93,4 @@ if __name__ == "__main__":
     model = ResUNetAtt(blocks=blocks, layers=layers, skips=skip)
     model.to(device='cuda')
 
-    summary(model, (80, 3, 256, 256), device='cuda', depth=2)
+    summary(model, (50, 3, 256, 256), device='cuda', depth=2)
