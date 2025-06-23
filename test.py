@@ -200,8 +200,10 @@ class Tester():
                 start_time = time.time()
                 y_pred = model(image)
 
-                y_disc_pred = y_pred[0].squeeze()
-                y_cup_pred = y_pred[1].squeeze()
+                print(y_pred.shape)
+
+                y_disc_pred = y_pred[0][0].squeeze()
+                y_cup_pred = y_pred[0][1].squeeze()
 
                 y_disc_pred = torch.sigmoid(y_disc_pred)
                 y_cup_pred = torch.sigmoid(y_cup_pred)
