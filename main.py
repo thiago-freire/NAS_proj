@@ -65,7 +65,7 @@ def model(blocks, layers, skips, alfa_loss = 0.5,
 
             trainer = Trainer(train, validation, fold=i, scale=albu_scale, base_results=base_results, modelDict=modelDict)
             trainer.setHyperParam(lr=lr, batch_size=batch_size, epochs=epochs, 
-                                  alfa_loss=alfa_loss)
+                                  alfa_loss=alfa_loss, alfa_class=0.5)
             trainer.run()
 
             tester = Tester(test, fold=i, base_results=base_results, modelDict=modelDict)
