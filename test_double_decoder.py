@@ -12,7 +12,7 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 
 from data import DriveDataset
-from model import ResUNetAtt
+from model_double_decoder import ResUNetAtt
 
 
 dimension = 256
@@ -198,12 +198,12 @@ class Tester():
             with torch.no_grad():
                 """ Prediction and Calculating FPS """
                 start_time = time.time()
-                y_pred = model(image)
+                y_pred_disc, y_pred_cup = model(image)
 
                 # print(y_pred.shape)
 
-                y_disc_pred = y_pred[0][0].squeeze()
-                y_cup_pred = y_pred[0][1].squeeze()
+                y_disc_pred = y_pred_disc.squeeze()
+                y_cup_pred = y_pred_cup.squeeze()
 
                 y_disc_pred = torch.sigmoid(y_disc_pred)
                 y_cup_pred = torch.sigmoid(y_cup_pred)

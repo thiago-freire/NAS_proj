@@ -1,7 +1,7 @@
 import os
 # from train_loss import Trainer
-from test import Tester
-from train import Trainer
+from test_double_decoder import Tester
+from train_double_decoder import Trainer
 from utils import loadData
 import numpy as np
 from sklearn.model_selection import train_test_split, KFold
@@ -10,10 +10,10 @@ import optuna
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 def model(blocks, layers, skips, alfa_loss = 0.5,
-          epochs = 20, n_folds = 5, albu_scale=1):
+          epochs = 35, n_folds = 5, albu_scale=1):
 
     lr = 1e-3
-    batch_size = 50
+    batch_size = 35
 
     modelDict = {'blocks':blocks,
                  'layers':layers,
@@ -108,10 +108,10 @@ def model(blocks, layers, skips, alfa_loss = 0.5,
 
         print(f"Treino: {len(train)}\tValidação: {len(validation)}\tTeste: {len(test)}" )
 
-        trainer = Trainer(train, validation, 7, scale=albu_scale, base_results=base_results, modelDict=modelDict)
-        trainer.setHyperParam(lr=lr, batch_size=batch_size, 
-                              epochs=epochs, alfa_loss=alfa_loss, alfa_class=0.5)
-        trainer.run()
+        # trainer = Trainer(train, validation, 7, scale=albu_scale, base_results=base_results, modelDict=modelDict)
+        # trainer.setHyperParam(lr=lr, batch_size=batch_size, 
+        #                       epochs=epochs, alfa_loss=alfa_loss, alfa_class=0.5)
+        # trainer.run()
 
         tester = Tester(test, 7, base_results, modelDict)
         return tester.run()
@@ -137,7 +137,7 @@ def objective(trial: optuna.Trial) -> float:
         skip = trial.suggest_categorical(f"skip_{i+1}", [True, False])
         skips.append(skip)
 
-    dice_disc, dice_cup = model(blocks, layers, skips, alfa_loss, epochs=100, 
+    dice_disc, dice_cup = model(blocks, layers, skips, alfa_loss, epochs=35, 
                                 n_folds = 1, albu_scale = albu_scale)
     
     return dice_cup, dice_disc
@@ -157,19 +157,19 @@ def runOptuna():
             storage="postgresql://postgres:postgres@192.168.200.169/optuna",  # Specify the storage URL here.
             study_name="Optimização do Modelo")
     
-    study.optimize(objective, n_trials=100)
+    study.optimize(objective, n_trials=10)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    runOptuna()
+    # runOptuna()
     # model(k = 2, batch_size = 20, epochs = 50,  
     #       n_folds = 5, albu_scale = 2, 
     #       alfa_loss = 0.61)
 
-    # blocks = ['AT', 'AT', 'AT', 'NT', 'NT', 'AT', 'AT', 'AT']
-    # layers = [5,5,5,5]
-    # skips = [True, True, True, True]
+    blocks = ['AT', 'AT', 'C', 'C', 'AT', 'AT', 'AT', 'NT']
+    layers = [5,4,5,2]
+    skips = [True, True, False, False]
             
-    # dice_disc, dice_cup = model(blocks, layers, skips, n_folds=1)
+    dice_disc, dice_cup = model(blocks, layers, skips, n_folds=1, albu_scale=4, alfa_loss=0.6970439616512919)
     
