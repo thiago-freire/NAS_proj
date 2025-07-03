@@ -37,8 +37,11 @@ class ResUNetAtt(nn.Module):
 
         if block == 'NT':
             layers.append(ResBlock(self.in_channels, out_channels, stride=2, downsample=downsample))
-        else:
+        elif block == 'AT':
             layers.append(ResBlockAT(self.in_channels, out_channels, stride=2, downsample=downsample))
+        else:
+            layers.append(ConvBlock(self.in_channels, out_channels, stride=2))
+
         self.in_channels = out_channels
         if cup:
             self.in_channels_cup = out_channels
@@ -46,8 +49,10 @@ class ResUNetAtt(nn.Module):
         for _ in range(1, blocks):
             if block == 'AT':
                 layers.append(ResBlockAT(out_channels, out_channels))
-            else:
+            elif block == 'NT':
                 layers.append(ResBlock(out_channels, out_channels))
+            else:
+                layers.append(ConvBlock(self.in_channels, out_channels))
         
         return nn.Sequential(*layers)
     
@@ -104,9 +109,9 @@ class ResUNetAtt(nn.Module):
 if __name__ == "__main__":
 
     blocks = ['AT', 'AT', 'NT', 'NT', 'AT', 'AT', 'AT', 'NT']
-    layers = [5,4,5,2]
+    layers = [5,5,5,5]
     skips = [True, True, False, False]
     model = ResUNetAtt(blocks=blocks, layers=layers, skips=skips)
     model.to(device='cuda')
 
-    summary(model, (35, 3, 256, 256), device='cuda', depth=2)
+    summary(model, (24, 3, 256, 256), device='cuda', depth=2)

@@ -9,11 +9,11 @@ import optuna
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
-def model(blocks, layers, skips, alfa_loss = 0.5,
+def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
           epochs = 35, n_folds = 5, albu_scale=1):
 
     lr = 1e-3
-    batch_size = 35
+    batch_size = 24
 
     modelDict = {'blocks':blocks,
                  'layers':layers,
@@ -65,38 +65,11 @@ def model(blocks, layers, skips, alfa_loss = 0.5,
 
             trainer = Trainer(train, validation, fold=i, scale=albu_scale, base_results=base_results, modelDict=modelDict)
             trainer.setHyperParam(lr=lr, batch_size=batch_size, epochs=epochs, 
-                                  alfa_loss=alfa_loss)
+                                  alfa_loss=alfa_loss, alfa_class=alfa_class)
             trainer.run()
 
             tester = Tester(test, fold=i, base_results=base_results, modelDict=modelDict)
             tester.run()
-
-        # for i in range(kFold.get_n_splits()):
-                
-        #     origa_train, origa_test = origa_paths[origa_folds[i][0]], origa_paths[origa_folds[i][1]]
-        #     refuge_train, refuge_test = refuge_paths[refuge_folds[i][0]], refuge_paths[refuge_folds[i][1]]
-
-        #     train = np.concatenate([origa_train, refuge_train], axis=0)
-        #     test = np.concatenate([origa_test, refuge_test], axis=0)
-
-        #     validation_size = len(test)/len(train)
-        #     train, validation = train_test_split(train, test_size=validation_size)
-        #     print(f"Treino: {len(train)}\tValidação: {len(validation)}\tTeste: {len(test)}" )
-
-        #     old = "/backup/thiago.freire/Dataset/"
-        #     new = f"{base_results}disc_dataset/"
-
-        #     new_train = [[line[0].replace(old, new),line[1].replace(old, new)] for line in train]
-        #     new_valid = [[line[0].replace(old, new),line[1].replace(old, new)] for line in validation]
-        #     new_test = [[line[0].replace(old, new),line[1].replace(old, new)] for line in test]
-
-        #     trainer = Trainer(new_train, new_valid, fold=i, scale=albu_scale, base_results=base_results, k=k, tipo='cup')
-        #     trainer.setHyperParam(lr=lr, batch_size=batch_size, epochs=epochs, 
-        #                           alfa_loss=alfa_loss)
-        #     trainer.run()
-
-        #     tester = Tester(new_test, fold=i, base_results=base_results, k=k, tipo='cup')
-        #     tester.run()
         
     else: 
 
@@ -108,10 +81,10 @@ def model(blocks, layers, skips, alfa_loss = 0.5,
 
         print(f"Treino: {len(train)}\tValidação: {len(validation)}\tTeste: {len(test)}" )
 
-        # trainer = Trainer(train, validation, 7, scale=albu_scale, base_results=base_results, modelDict=modelDict)
-        # trainer.setHyperParam(lr=lr, batch_size=batch_size, 
-        #                       epochs=epochs, alfa_loss=alfa_loss, alfa_class=0.5)
-        # trainer.run()
+        trainer = Trainer(train, validation, 7, scale=albu_scale, base_results=base_results, modelDict=modelDict)
+        trainer.setHyperParam(lr=lr, batch_size=batch_size, 
+                              epochs=epochs, alfa_loss=alfa_loss, alfa_class=alfa_class)
+        trainer.run()
 
         tester = Tester(test, 7, base_results, modelDict)
         return tester.run()
@@ -120,7 +93,9 @@ def objective(trial: optuna.Trial) -> float:
 
     albu_scale = trial.suggest_int("albumentations", 1, 4)
 
-    alfa_loss = trial.suggest_float("alfa_loss", 0.4, 0.7)
+    alfa_loss = trial.suggest_float("alfa_loss", 0.3, 0.7)
+
+    alfa_class = trial.suggest_float("alfa_class", 0.3, 0.7)
 
     blocks = []
     for i in range(8):
@@ -157,19 +132,19 @@ def runOptuna():
             storage="postgresql://postgres:postgres@192.168.200.169/optuna",  # Specify the storage URL here.
             study_name="Optimização do Modelo")
     
-    study.optimize(objective, n_trials=10)
+    study.optimize(objective, n_trials=100)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    # runOptuna()
+    runOptuna()
     # model(k = 2, batch_size = 20, epochs = 50,  
     #       n_folds = 5, albu_scale = 2, 
     #       alfa_loss = 0.61)
 
-    blocks = ['AT', 'AT', 'C', 'C', 'AT', 'AT', 'AT', 'NT']
-    layers = [5,4,5,2]
-    skips = [True, True, False, False]
+    # blocks = ['AT', 'AT', 'C', 'C', 'AT', 'AT', 'AT', 'NT']
+    # layers = [5,4,5,2]
+    # skips = [True, True, False, False]
             
-    dice_disc, dice_cup = model(blocks, layers, skips, n_folds=1, albu_scale=4, alfa_loss=0.6970439616512919)
+    # model(blocks, layers, skips, n_folds=5, albu_scale=4, alfa_loss=0.6970439616512919, epochs=100)
     
