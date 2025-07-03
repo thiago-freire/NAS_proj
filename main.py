@@ -112,14 +112,14 @@ def objective(trial: optuna.Trial) -> float:
         skip = trial.suggest_categorical(f"skip_{i+1}", [True, False])
         skips.append(skip)
 
-    dice_disc, dice_cup = model(blocks, layers, skips, alfa_loss, epochs=35, 
+    dice_disc, dice_cup = model(blocks, layers, skips, alfa_loss, alfa_class, epochs=35, 
                                 n_folds = 1, albu_scale = albu_scale)
     
     return dice_cup, dice_disc
 
 def runOptuna():
 
-    create = True
+    create = False
 
     if create:
         study = optuna.create_study(
