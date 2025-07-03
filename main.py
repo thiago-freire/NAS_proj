@@ -9,7 +9,7 @@ import optuna
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
-def model(blocks, layers, skips, alfa_loss = 0.5,
+def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
           epochs = 35, n_folds = 5, albu_scale=1):
 
     lr = 1e-3
@@ -65,7 +65,7 @@ def model(blocks, layers, skips, alfa_loss = 0.5,
 
             trainer = Trainer(train, validation, fold=i, scale=albu_scale, base_results=base_results, modelDict=modelDict)
             trainer.setHyperParam(lr=lr, batch_size=batch_size, epochs=epochs, 
-                                  alfa_loss=alfa_loss, alfa_class=0.5)
+                                  alfa_loss=alfa_loss, alfa_class=alfa_class)
             trainer.run()
 
             tester = Tester(test, fold=i, base_results=base_results, modelDict=modelDict)
@@ -83,7 +83,7 @@ def model(blocks, layers, skips, alfa_loss = 0.5,
 
         trainer = Trainer(train, validation, 7, scale=albu_scale, base_results=base_results, modelDict=modelDict)
         trainer.setHyperParam(lr=lr, batch_size=batch_size, 
-                              epochs=epochs, alfa_loss=alfa_loss, alfa_class=0.5)
+                              epochs=epochs, alfa_loss=alfa_loss, alfa_class=alfa_class)
         trainer.run()
 
         tester = Tester(test, 7, base_results, modelDict)
@@ -93,7 +93,9 @@ def objective(trial: optuna.Trial) -> float:
 
     albu_scale = trial.suggest_int("albumentations", 1, 4)
 
-    alfa_loss = trial.suggest_float("alfa_loss", 0.4, 0.7)
+    alfa_loss = trial.suggest_float("alfa_loss", 0.3, 0.7)
+
+    alfa_class = trial.suggest_float("alfa_class", 0.3, 0.7)
 
     blocks = []
     for i in range(8):
@@ -117,7 +119,7 @@ def objective(trial: optuna.Trial) -> float:
 
 def runOptuna():
 
-    create = False
+    create = True
 
     if create:
         study = optuna.create_study(
@@ -130,19 +132,19 @@ def runOptuna():
             storage="postgresql://postgres:postgres@192.168.200.169/optuna",  # Specify the storage URL here.
             study_name="Optimização do Modelo")
     
-    study.optimize(objective, n_trials=10)
+    study.optimize(objective, n_trials=100)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    # runOptuna()
+    runOptuna()
     # model(k = 2, batch_size = 20, epochs = 50,  
     #       n_folds = 5, albu_scale = 2, 
     #       alfa_loss = 0.61)
 
-    blocks = ['AT', 'AT', 'C', 'C', 'AT', 'AT', 'AT', 'NT']
-    layers = [5,4,5,2]
-    skips = [True, True, False, False]
+    # blocks = ['AT', 'AT', 'C', 'C', 'AT', 'AT', 'AT', 'NT']
+    # layers = [5,4,5,2]
+    # skips = [True, True, False, False]
             
-    dice_disc, dice_cup = model(blocks, layers, skips, n_folds=5, albu_scale=4, alfa_loss=0.6970439616512919)
+    # model(blocks, layers, skips, n_folds=5, albu_scale=4, alfa_loss=0.6970439616512919, epochs=100)
     
