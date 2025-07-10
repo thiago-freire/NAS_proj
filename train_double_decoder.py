@@ -169,6 +169,7 @@ class Trainer():
             data_str = f'Epoch: {epoch+1:02} | Epoch Time: {epoch_mins}m {epoch_secs}s\n'
             data_str += f'\tTrain Loss: {train_loss:2.4f}\n'
             data_str += f'\t Val. Loss: {valid_loss:2.4f}\n'
+            data_str += f'\t Patience: {self.patience}\n'
             print(data_str)
             
             # Early Stop
