@@ -22,6 +22,8 @@ class Trainer():
                                 layers=modelDict['layers'], 
                                 skips=modelDict['skip'])
         
+        self.patience = 20
+        
         """ Seeding """
         seeding(42)
 
@@ -138,6 +140,12 @@ class Trainer():
 
         print("Iniciando Treinamento...")
         for epoch in epocas:
+            
+            # Early Stop
+            if self.patience < 0:
+                print(f"Parando na época {epoch} por Early Stop.")
+                break
+
             start_time = time.time()
             print(f"Iniciando época {epoch+1} de {self.num_epochs}...")
             train_loss = self.train(train_loader, optimizer, loss_fn, self.device)
@@ -152,6 +160,7 @@ class Trainer():
                 print(data_str)
 
                 best_valid_loss = valid_loss
+                self.patience = 20
                 torch.save(self.model.state_dict(), self.checkpoint_path)
 
             end_time = time.time()
@@ -161,6 +170,9 @@ class Trainer():
             data_str += f'\tTrain Loss: {train_loss:2.4f}\n'
             data_str += f'\t Val. Loss: {valid_loss:2.4f}\n'
             print(data_str)
+            
+            # Early Stop
+            self.patience -= 1
 
         figura = plt.figure()
         figura.add_subplot(111)
