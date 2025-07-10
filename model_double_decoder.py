@@ -108,10 +108,10 @@ class ResUNetAtt(nn.Module):
     
 if __name__ == "__main__":
 
-    blocks = ['AT', 'AT', 'NT', 'NT', 'AT', 'AT', 'AT', 'NT']
-    layers = [5,4,5,2]
-    skips = [True, True, False, False]
+    blocks = ['AT', 'AT', 'AT', 'C', 'AT', 'C', 'AT', 'C']
+    layers = [3,4,4,5]
+    skips = [False, True, True, True]
     model = ResUNetAtt(blocks=blocks, layers=layers, skips=skips)
     model.to(device='cuda')
 
-    summary(model, (35, 3, 256, 256), device='cuda', depth=2)
+    summary(model, (42, 3, 256, 256), device='cuda', depth=2)

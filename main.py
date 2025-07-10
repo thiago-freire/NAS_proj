@@ -13,7 +13,7 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
           epochs = 35, n_folds = 5, albu_scale=1):
 
     lr = 1e-3
-    batch_size = 35
+    batch_size = 40
 
     modelDict = {'blocks':blocks,
                  'layers':layers,
@@ -26,8 +26,8 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
         base = "/backup/thiago.freire/Dataset/"
         base_results = "/backup/thiago.freire/results/cascade/"
     else:
-        base = "C:/Projetos/Datasets/thiago.freire/"
-        base_results = "E:/results/NAS/"
+        base = "C:\\Projetos\\Datasets\\thiago.freire\\"
+        base_results = "E:\\results\\NAS\\"
         
     refuge = f"{base}REFUGE/other"
     origa = f"{base}ORIGA/"
@@ -62,6 +62,8 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
             validation_size = len(test)/len(train)
             train, validation = train_test_split(train, test_size=validation_size)
             print(f"Treino: {len(train)}\tValidação: {len(validation)}\tTeste: {len(test)}" )
+
+            np.savetxt(f"{base_results}fold/fold_{i}/test.txt", test[:,0], fmt="%s", delimiter='\t')
 
             trainer = Trainer(train, validation, fold=i, scale=albu_scale, base_results=base_results, modelDict=modelDict)
             trainer.setHyperParam(lr=lr, batch_size=batch_size, epochs=epochs, 
@@ -132,19 +134,19 @@ def runOptuna():
             storage="postgresql://postgres:postgres@192.168.200.169/optuna",  # Specify the storage URL here.
             study_name="Optimização do Modelo")
     
-    study.optimize(objective, n_trials=100)
+    study.optimize(objective, n_trials=10)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    runOptuna()
+    # runOptuna()
     # model(k = 2, batch_size = 20, epochs = 50,  
     #       n_folds = 5, albu_scale = 2, 
     #       alfa_loss = 0.61)
 
-    # blocks = ['AT', 'AT', 'C', 'C', 'AT', 'AT', 'AT', 'NT']
-    # layers = [5,4,5,2]
-    # skips = [True, True, False, False]
+    blocks = ['AT', 'AT', 'AT', 'C', 'AT', 'C', 'AT', 'C']
+    layers = [3,4,4,5]
+    skips = [False, True, True, True]
             
-    # model(blocks, layers, skips, n_folds=5, albu_scale=4, alfa_loss=0.6970439616512919, epochs=100)
+    model(blocks, layers, skips, n_folds=5, albu_scale=6, alfa_loss=0.6, alfa_class=0.4, epochs=100)
     

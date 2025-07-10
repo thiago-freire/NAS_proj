@@ -177,10 +177,7 @@ class Tester():
             file.write("f1-disc;f1-cup;recall-disc;recall-cup;")
             file.write("precision-disc;precision-cup;")
             file.write("accuracy-disc;accuracy-cup;\n")
-        #     file.write("arquivo;jaccard-disc;")
-        #     file.write("f1-disc;recall-disc;")
-        #     file.write("precision-disc;")
-        #     file.write("accuracy-disc;\n")
+
         loader = DataLoader(
             dataset = self.dataset,
             batch_size = 1,
@@ -221,11 +218,6 @@ class Tester():
                         f"{score['recall']['disc']:1.4f};{score['recall']['cup']:1.4f};"+
                         f"{score['precision']['disc']:1.4f};{score['precision']['cup']:1.4f};"+
                         f"{score['accuracy']['disc']:1.4f};{score['accuracy']['cup']:1.4f}\n")
-            #     file.write(f"{score['jaccard']['disc']:1.4f};"+
-            #             f"{score['f1']['disc']:1.4f};"+
-            #             f"{score['recall']['disc']:1.4f};"+
-            #             f"{score['precision']['disc']:1.4f};"+
-            #             f"{score['accuracy']['disc']:1.4f}\n")
 
             """ Saving masks """
             ori_mask_disc = self.mask_parse(mask[:,:,1])
@@ -272,11 +264,6 @@ class Tester():
                         f"Recall:\n\tDisc - {recall['disc']:1.4f}\n\tCup - {recall['cup']:1.4f}\n"+
                         f"Precision:\n\tDisc - {precision['disc']:1.4f}\n\tCup - {precision['cup']:1.4f}\n"+
                         f"Acc:\n\tDisc - {accuracy['disc']:1.4f}\n\tCup - {accuracy['cup']:1.4f}\n")
-        #     file.write(f"Jaccard:\n\tDisc - {jaccard['disc']:1.4f}\n"+
-        #                 f"F1:\n\tDisc - {f1['disc']:1.4f}\n"+
-        #                 f"Recall:\n\tDisc - {recall['disc']:1.4f}\n"+
-        #                 f"Precision:\n\tDisc - {precision['disc']:1.4f}\n"+
-        #                 f"Acc:\n\tDisc - {accuracy['disc']:1.4f}\n")
             
             fps = 1/np.mean(time_taken)
             file.write(f"FPS: {fps}")
