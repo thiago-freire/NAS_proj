@@ -136,6 +136,7 @@ class Trainer():
 
         loss_values = []
         valid_loss_values = []
+        graf_epocas = []
         epocas = range(self.num_epochs)
 
         print("Iniciando Treinamento...")
@@ -144,6 +145,7 @@ class Trainer():
             # Early Stop
             if self.patience < 0:
                 print(f"Parando na época {epoch} por Early Stop.")
+                epocas = epoch
                 break
 
             start_time = time.time()
@@ -153,6 +155,7 @@ class Trainer():
 
             loss_values.append(train_loss)
             valid_loss_values.append(valid_loss)
+            graf_epocas.append(epoch)
 
             """ Saving the model """
             if valid_loss < best_valid_loss:
@@ -177,8 +180,8 @@ class Trainer():
 
         figura = plt.figure()
         figura.add_subplot(111)
-        plt.plot(epocas, loss_values, color='r', label='train loss')
-        plt.plot(epocas, valid_loss_values, color='b', label='test loss')
+        plt.plot(graf_epocas, loss_values, color='r', label='train loss')
+        plt.plot(graf_epocas, valid_loss_values, color='b', label='test loss')
         plt.title('Loss Comparison')
         plt.ylabel('Loss')
         plt.xlabel('Epocas')

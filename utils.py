@@ -21,6 +21,15 @@ def epoch_time(start_time, end_time):
     elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
     return elapsed_mins, elapsed_secs
 
+""" Calculate the time taken """
+def fold_time(start_time, end_time):
+    elapsed_time = end_time - start_time
+    elapsed_mins = int(elapsed_time / 60)
+    elapsed_hor = int(elapsed_mins / 60)
+    elapsed_mins = int(elapsed_mins - (elapsed_hor * 60))
+    elapsed_secs = int(elapsed_time - ((elapsed_mins * 60)+(elapsed_hor * 360)))
+    return elapsed_hor, elapsed_mins, elapsed_secs
+
 """ Load Data """
 def loadData(Origa_path, Refuge_path):
 

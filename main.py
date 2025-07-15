@@ -1,8 +1,9 @@
 import os
+import time
 # from train_loss import Trainer
 from test_double_decoder import Tester
 from train_double_decoder import Trainer
-from utils import loadData
+from utils import fold_time, loadData
 import numpy as np
 from sklearn.model_selection import train_test_split, KFold
 import optuna
@@ -50,6 +51,9 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
             refuge_folds.append([train_index, test_index])
 
         for i in range(kFold.get_n_splits()):
+
+            start_time = time.time()
+            
             if not os.path.isdir(f"{base_results}fold/fold_{i}"):
                 os.mkdir(f"{base_results}fold/fold_{i}")
                 
@@ -72,6 +76,11 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
 
             tester = Tester(test, fold=i, base_results=base_results, modelDict=modelDict)
             tester.run()
+
+            end_time = time.time()
+            fold_hor, fold_mins, fold_secs = fold_time(start_time, end_time)
+            data_str = f'**************************************\nFold Time: {fold_hor}h {fold_mins}m {fold_secs}s\n**************************************'
+            print(data_str)
         
     else: 
 
@@ -144,9 +153,11 @@ if __name__ == '__main__':
     #       n_folds = 5, albu_scale = 2, 
     #       alfa_loss = 0.61)
 
-    blocks = ['AT', 'AT', 'AT', 'C', 'AT', 'C', 'AT', 'C']
-    layers = [3,4,4,5]
-    skips = [False, True, True, True]
+    os.environ['NO_ALBUMENTATIONS_UPDATE'] = '1'
+
+    blocks = ['AT','AT','AT','C','NT','C','AT','NT']
+    layers = [5,5,5,5]
+    skips = [False, True, True, False]
             
-    model(blocks, layers, skips, n_folds=5, albu_scale=6, alfa_loss=0.6, alfa_class=0.4, epochs=100)
+    model(blocks, layers, skips, n_folds=5, albu_scale=4, alfa_loss=0.549962875, alfa_class=0.474814334, epochs=100)
     
