@@ -44,9 +44,9 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
 
             start_time = time.time()
 
-            train = np.loadtxt(f"data_set/train_{i}.txt", fmt="%s", delimiter=",")
-            validation = np.loadtxt(f"data_set/val_{i}.txt", fmt="%s", delimiter=",")
-            # test = np.loadtxt(f"data_set/test_{i}.txt", fmt="%s", delimiter=",")
+            train = np.loadtxt(f"data_set/train_{i}.txt", delimiter=",")
+            validation = np.loadtxt(f"data_set/val_{i}.txt", delimiter=",")
+            # test = np.loadtxt(f"data_set/test_{i}.txt", delimiter=",")
 
             trainer = Trainer(train, validation, fold=i, scale=albu_scale, base_results=base_results, modelDict=modelDict)
             trainer.setHyperParam(lr=lr, batch_size=batch_size, epochs=epochs, 
