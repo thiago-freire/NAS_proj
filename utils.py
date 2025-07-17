@@ -63,7 +63,17 @@ def createHoldout(origa_paths: np.ndarray, refuge_paths: np.ndarray):
         np.savetxt(f"data_set/val_{i}.txt", validation, fmt="%s", delimiter=",")
         np.savetxt(f"data_set/test_{i}.txt", test, fmt="%s", delimiter=",")
 
-        
+""" Open Holdout file"""
+def openHoldout(filename:str):
+
+    with open(filename) as f:
+        linhas = f.readlines()
+
+    linhas = [linha.strip().split(",") for linha in linhas]
+
+    # Converte para um array numpy de strings
+    return np.array(linhas, dtype=str)
+
 
 """ Load Data """
 def loadData(Origa_path, Refuge_path):

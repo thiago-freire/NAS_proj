@@ -3,7 +3,7 @@ import time
 # from train_loss import Trainer
 from test_double_decoder import Tester
 from train_double_decoder import Trainer
-from utils import fold_time, loadData
+from utils import fold_time, loadData, openHoldout
 import numpy as np
 from sklearn.model_selection import train_test_split, KFold
 import optuna
@@ -40,13 +40,16 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
 
     if n_folds != 1:
 
+        dices = []
         for i in range(5):
 
             start_time = time.time()
 
-            train = np.loadtxt(f"data_set/train_{i}.txt", delimiter=",")
-            validation = np.loadtxt(f"data_set/val_{i}.txt", delimiter=",")
+            train = openHoldout(f"data_set/train_{i}.txt")
+            validation = openHoldout(f"data_set/val_{i}.txt")
             # test = np.loadtxt(f"data_set/test_{i}.txt", delimiter=",")
+
+            print(train.shape, validation.shape)
 
             trainer = Trainer(train, validation, fold=i, scale=albu_scale, base_results=base_results, modelDict=modelDict)
             trainer.setHyperParam(lr=lr, batch_size=batch_size, epochs=epochs, 
@@ -54,13 +57,15 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
             trainer.run()
 
             tester = Tester(validation, fold=i, base_results=base_results, modelDict=modelDict)
-            tester.run()
+            dices.append(tester.run())
 
             end_time = time.time()
             fold_hor, fold_mins, fold_secs = fold_time(start_time, end_time)
-            data_str = f'**************************************\nFold Time: {fold_hor}h {fold_mins}m {fold_secs}s\n**************************************'
+            data_str = f'**************************************\nFold {i} Time: {fold_hor}h {fold_mins}m {fold_secs}s\n**************************************'
             print(data_str)
         
+        return np.array(dices)
+    
     else: 
 
         if not os.path.isdir(f"{base_results}fold/fold_7"):
@@ -81,29 +86,38 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
 
 def objective(trial: optuna.Trial) -> float:
 
-    albu_scale = trial.suggest_int("albumentations", 1, 4)
+    albu_scale = 4 #trial.suggest_int("albumentations", 1, 4)
 
-    alfa_loss = trial.suggest_float("alfa_loss", 0.3, 0.7)
+    alfa_loss = 0.549962875 #trial.suggest_float("alfa_loss", 0.3, 0.7)
 
-    alfa_class = trial.suggest_float("alfa_class", 0.3, 0.7)
+    alfa_class = 0.474814334 #trial.suggest_float("alfa_class", 0.3, 0.7)
 
     blocks = []
-    for i in range(8):
+    for i in range(4):
         cate = trial.suggest_categorical(f"step_{i+1}", ["AT", "NT", "C"])
         blocks.append(cate)
-    
-    layers = []
-    for i in range(4):
-        layer = trial.suggest_int(f"layer_{i+1}", 2, 5)
-        layers.append(layer)
-    
-    skips = []
-    for i in range(4):
-        skip = trial.suggest_categorical(f"skip_{i+1}", [True, False])
-        skips.append(skip)
+    blocks = np.concatenate((blocks, blocks[::-1]))
 
-    dice_disc, dice_cup = model(blocks, layers, skips, alfa_loss, alfa_class, epochs=35, 
-                                n_folds = 1, albu_scale = albu_scale)
+    layers = [5,5,5,5]
+    # for i in range(4):
+    #     layer = trial.suggest_int(f"layer_{i+1}", 2, 5)
+    #     layers.append(layer)
+    
+    skips = [False, False, False, False]
+    # for i in range(4):
+    #     skip = trial.suggest_categorical(f"skip_{i+1}", [True, False])
+    #     skips.append(skip)
+
+    dices = model(blocks, layers, skips, alfa_loss, alfa_class, epochs=35,
+                  n_folds = 5, albu_scale = albu_scale)
+    
+    dice_oc = dices[:,0]
+
+    dice_od = dices[:,1]
+
+    dice_cup = np.mean(dice_oc) - np.std(dice_oc)
+
+    dice_disc = np.mean(dice_od) - np.std(dice_od)
     
     return dice_cup, dice_disc
 
