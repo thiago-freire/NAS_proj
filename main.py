@@ -40,41 +40,20 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
 
     if n_folds != 1:
 
-        kFold=KFold(n_splits=n_folds,random_state=42,shuffle=True)
-
-        origa_folds = []
-        for train_index, test_index in kFold.split(origa_paths):
-            origa_folds.append([train_index, test_index])
-
-        refuge_folds = []
-        for train_index, test_index in kFold.split(refuge_paths):
-            refuge_folds.append([train_index, test_index])
-
-        for i in range(kFold.get_n_splits()):
+        for i in range(5):
 
             start_time = time.time()
-            
-            if not os.path.isdir(f"{base_results}fold/fold_{i}"):
-                os.mkdir(f"{base_results}fold/fold_{i}")
-                
-            origa_train, origa_test = origa_paths[origa_folds[i][0]], origa_paths[origa_folds[i][1]]
-            refuge_train, refuge_test = refuge_paths[refuge_folds[i][0]], refuge_paths[refuge_folds[i][1]]
 
-            train = np.concatenate([origa_train, refuge_train], axis=0)
-            test = np.concatenate([origa_test, refuge_test], axis=0)
-
-            validation_size = len(test)/len(train)
-            train, validation = train_test_split(train, test_size=validation_size)
-            print(f"Treino: {len(train)}\tValidação: {len(validation)}\tTeste: {len(test)}" )
-
-            np.savetxt(f"{base_results}fold/fold_{i}/test.txt", test[:,0], fmt="%s", delimiter='\t')
+            train = np.loadtxt(f"data_set/train_{i}.txt", fmt="%s", delimiter=",")
+            validation = np.loadtxt(f"data_set/val_{i}.txt", fmt="%s", delimiter=",")
+            # test = np.loadtxt(f"data_set/test_{i}.txt", fmt="%s", delimiter=",")
 
             trainer = Trainer(train, validation, fold=i, scale=albu_scale, base_results=base_results, modelDict=modelDict)
             trainer.setHyperParam(lr=lr, batch_size=batch_size, epochs=epochs, 
                                   alfa_loss=alfa_loss, alfa_class=alfa_class)
             trainer.run()
 
-            tester = Tester(test, fold=i, base_results=base_results, modelDict=modelDict)
+            tester = Tester(validation, fold=i, base_results=base_results, modelDict=modelDict)
             tester.run()
 
             end_time = time.time()
@@ -159,5 +138,5 @@ if __name__ == '__main__':
     layers = [5,5,5,5]
     skips = [False, True, True, False]
             
-    model(blocks, layers, skips, n_folds=5, albu_scale=4, alfa_loss=0.549962875, alfa_class=0.474814334, epochs=100)
+    model(blocks, layers, skips, n_folds=5, albu_scale=4, alfa_loss=0.549962875, alfa_class=0.474814334, epochs=10)
     

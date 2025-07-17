@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import torch
 from glob import glob
+from sklearn.model_selection import KFold, train_test_split
 
 def seeding(seed):
     random.seed(seed)
@@ -29,6 +30,40 @@ def fold_time(start_time, end_time):
     elapsed_mins = int(elapsed_mins - (elapsed_hor * 60))
     elapsed_secs = int(elapsed_time - ((elapsed_mins * 60)+(elapsed_hor * 360)))
     return elapsed_hor, elapsed_mins, elapsed_secs
+
+""" Create Roundout"""
+def createHoldout(origa_paths: np.ndarray, refuge_paths: np.ndarray):
+
+    kFold=KFold(n_splits=5,random_state=42,shuffle=True)
+
+    origa_folds = []
+    for train_index, test_index in kFold.split(origa_paths):
+            origa_folds.append([train_index, test_index])
+
+    refuge_folds = []
+    for train_index, test_index in kFold.split(refuge_paths):
+        refuge_folds.append([train_index, test_index])
+
+
+    if not os.path.isdir("data_set"):
+        os.mkdir("data_set")
+
+    for i in range(kFold.get_n_splits()):
+
+        origa_train, origa_test = origa_paths[origa_folds[i][0]], origa_paths[origa_folds[i][1]]
+        refuge_train, refuge_test = refuge_paths[refuge_folds[i][0]], refuge_paths[refuge_folds[i][1]]
+
+        train = np.concatenate([origa_train, refuge_train], axis=0)
+        test = np.concatenate([origa_test, refuge_test], axis=0)
+
+        train, validation = train_test_split(train, test_size=len(test))
+        print(f"Treino: {len(train)}\tValidação: {len(validation)}\tTeste: {len(test)}" )
+
+        np.savetxt(f"data_set/train_{i}.txt", train, fmt="%s", delimiter=",")
+        np.savetxt(f"data_set/val_{i}.txt", validation, fmt="%s", delimiter=",")
+        np.savetxt(f"data_set/test_{i}.txt", test, fmt="%s", delimiter=",")
+
+        
 
 """ Load Data """
 def loadData(Origa_path, Refuge_path):
@@ -136,14 +171,16 @@ def loadDallysonData(base_path, all):
 
 if __name__ == '__main__':
 
-    base = 'C:/Projetos/Datasets/thiago.freire/'
+    base = '/backup/thiago.freire/Dataset/'
     
-    refuge_path = f"{base}REFUGE/"
+    refuge_path = f"{base}REFUGE/other/"
     origa_path = f"{base}ORIGA/"
 
-    origa, refuge = loadDataCL(origa_path, refuge_path)
+    origa, refuge = loadData(origa_path, refuge_path)
 
-    print(origa[0], refuge[0])
+    print(origa.shape, refuge.shape)
+
+    createHoldout(origa, refuge)
 
     # sgmd = loadDataClassify('E:\\SGMD')
 
