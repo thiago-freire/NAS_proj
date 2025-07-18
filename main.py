@@ -93,10 +93,10 @@ def objective(trial: optuna.Trial) -> float:
     alfa_class = 0.474814334 #trial.suggest_float("alfa_class", 0.3, 0.7)
 
     blocks = []
-    for i in range(4):
+    for i in range(8):
         cate = trial.suggest_categorical(f"step_{i+1}", ["AT", "NT", "C"])
         blocks.append(cate)
-    blocks = np.concatenate((blocks, blocks[::-1]))
+    # blocks = np.concatenate((blocks, blocks[::-1]))
 
     layers = [5,5,5,5]
     # for i in range(4):
