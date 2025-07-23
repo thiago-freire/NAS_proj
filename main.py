@@ -115,9 +115,18 @@ def objective(trial: optuna.Trial) -> float:
 
     dice_od = dices[:,1]
 
-    dice_cup = np.mean(dice_oc) - np.std(dice_oc)
+    oc_mean = np.mean(dice_oc)
+    oc_std = np.std(dice_oc)
 
-    dice_disc = np.mean(dice_od) - np.std(dice_od)
+    od_mean = np.mean(dice_od)
+    od_std = np.std(dice_od)
+
+    with open(f"/backup/thiago.freire/results/NAS/trial_{trial.number}.txt","w") as file:
+        file.write(f"Dice OC Mean = {oc_mean}\tDice OC Std = {oc_std}\nDice OD Mean = {od_mean}\tDice OD Std = {od_std}")
+
+    dice_cup = oc_mean - oc_std
+
+    dice_disc = od_mean - od_std
     
     return dice_cup, dice_disc
 
