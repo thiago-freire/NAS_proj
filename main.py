@@ -25,7 +25,7 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
     base_results = ""
     if os.name == 'posix':
         base = "/backup/thiago.freire/Dataset/"
-        base_results = "/backup/thiago.freire/results/cascade/"
+        base_results = "/backup/thiago.freire/results/NAS/"
     else:
         base = "C:\\Projetos\\Datasets\\thiago.freire\\"
         base_results = "E:\\results\\NAS\\"
