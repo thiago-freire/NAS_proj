@@ -1,7 +1,6 @@
-[I 2025-07-03 13:12:49,966] A new study created in RDB with name: Optimização do Modelo
-Treino: 1336	Validação: 278	Teste: 236
+[I 2025-07-23 14:15:15,109] A new study created in RDB with name: Optimização do Modelo
 Dataset Size:
-Train: 1336 - Valid: 278
+Train: 1110 - Valid: 370
 
 Select device cuda
 ==========================================================================================
@@ -26,79 +25,52 @@ ResUNetAtt                               [35, 1, 256, 256]         --
 │    └─ConvBlock: 2-12                   [35, 256, 16, 16]         885,760
 │    └─ConvBlock: 2-13                   [35, 256, 16, 16]         1,180,672
 │    └─ConvBlock: 2-14                   [35, 256, 16, 16]         1,180,672
+│    └─ConvBlock: 2-15                   [35, 256, 16, 16]         1,180,672
 ├─Sequential: 1-5                        [35, 512, 8, 8]           --
-│    └─ResBlock: 2-15                    [35, 512, 8, 8]           3,673,088
-│    └─ResBlock: 2-16                    [35, 512, 8, 8]           4,720,640
-│    └─ResBlock: 2-17                    [35, 512, 8, 8]           4,720,640
+│    └─ResBlockAT: 2-16                  [35, 512, 8, 8]           3,673,088
+│    └─ResBlockAT: 2-17                  [35, 512, 8, 8]           4,720,640
+│    └─ResBlockAT: 2-18                  [35, 512, 8, 8]           4,720,640
 ├─ModuleList: 1-6                        --                        --
-│    └─ResBlockUP: 2-18                  [35, 256, 16, 16]         1,836,288
-│    └─Sequential: 2-19                  [35, 256, 16, 16]         2,361,344
+│    └─ResBlockUPAT: 2-19                [35, 256, 16, 16]         1,836,288
+│    └─Sequential: 2-20                  [35, 256, 16, 16]         2,361,344
 ├─ModuleList: 1-7                        --                        --
-│    └─ConvBlockUP: 2-20                 [35, 128, 32, 32]         426,624
-│    └─Sequential: 2-21                  [35, 128, 32, 32]         590,848
+│    └─ConvBlockUP: 2-21                 [35, 128, 32, 32]         426,624
+│    └─Sequential: 2-22                  [35, 128, 32, 32]         886,272
 ├─ModuleList: 1-8                        --                        --
-│    └─ConvBlockUP: 2-22                 [35, 64, 64, 64]          106,816
-│    └─Sequential: 2-23                  [35, 64, 64, 64]          221,952
+│    └─ResBlockUPAT: 2-23                [35, 64, 64, 64]          115,008
+│    └─Sequential: 2-24                  [35, 64, 64, 64]          221,952
 ├─ModuleList: 1-9                        --                        --
-│    └─ResBlockUPAT: 2-24                [35, 32, 128, 128]        28,832
-│    └─Sequential: 2-25                  [35, 32, 128, 128]        37,120
+│    └─ConvBlockUP: 2-25                 [35, 32, 128, 128]        26,784
+│    └─Sequential: 2-26                  [35, 32, 128, 128]        37,120
 ├─SegHEAD: 1-10                          [35, 1, 256, 256]         --
-│    └─Sequential: 2-26                  [35, 16, 256, 256]        2,096
-│    └─Sequential: 2-27                  [35, 1, 256, 256]         22
+│    └─Sequential: 2-27                  [35, 16, 256, 256]        2,096
+│    └─Sequential: 2-28                  [35, 1, 256, 256]         22
 ├─ModuleList: 1-11                       --                        --
-│    └─ResBlockUP: 2-28                  [35, 256, 16, 16]         1,836,288
-│    └─Sequential: 2-29                  [35, 256, 16, 16]         2,361,344
+│    └─ResBlockUPAT: 2-29                [35, 256, 16, 16]         1,836,288
+│    └─Sequential: 2-30                  [35, 256, 16, 16]         2,361,344
 ├─ModuleList: 1-12                       --                        --
-│    └─ConvBlockUP: 2-30                 [35, 128, 32, 32]         426,624
-│    └─Sequential: 2-31                  [35, 128, 32, 32]         590,848
+│    └─ConvBlockUP: 2-31                 [35, 128, 32, 32]         426,624
+│    └─Sequential: 2-32                  [35, 128, 32, 32]         886,272
 ├─ModuleList: 1-13                       --                        --
-│    └─ConvBlockUP: 2-32                 [35, 64, 64, 64]          106,816
-│    └─Sequential: 2-33                  [35, 64, 64, 64]          221,952
+│    └─ResBlockUPAT: 2-33                [35, 64, 64, 64]          115,008
+│    └─Sequential: 2-34                  [35, 64, 64, 64]          221,952
 ├─ModuleList: 1-14                       --                        --
-│    └─ResBlockUPAT: 2-34                [35, 32, 128, 128]        28,832
-│    └─Sequential: 2-35                  [35, 32, 128, 128]        37,120
+│    └─ConvBlockUP: 2-35                 [35, 32, 128, 128]        26,784
+│    └─Sequential: 2-36                  [35, 32, 128, 128]        37,120
 ├─SegHEAD: 1-15                          [35, 1, 256, 256]         --
-│    └─Sequential: 2-36                  [35, 16, 256, 256]        2,096
-│    └─Sequential: 2-37                  [35, 1, 256, 256]         22
+│    └─Sequential: 2-37                  [35, 16, 256, 256]        2,096
+│    └─Sequential: 2-38                  [35, 1, 256, 256]         22
 ==========================================================================================
-Total params: 28,906,220
-Trainable params: 28,906,220
+Total params: 30,690,028
+Trainable params: 30,690,028
 Non-trainable params: 0
-Total mult-adds (Units.GIGABYTES): 456.12
+Total mult-adds (Units.GIGABYTES): 487.83
 ==========================================================================================
 Input size (MB): 27.53
-Forward/backward pass size (MB): 11835.80
-Params size (MB): 115.62
-Estimated Total Size (MB): 11978.95
+Forward/backward pass size (MB): 12056.00
+Params size (MB): 122.76
+Estimated Total Size (MB): 12206.29
 ==========================================================================================
 Iniciando Treinamento...
 Iniciando época 1 de 35...
-Treinando com 153 mini-batchs
-Traceback (most recent call last):
-  File "/home/thiago/NAS_proj/main.py", line 4, in <module>
-    from test_double_decoder import Tester
-  File "/home/thiago/NAS_proj/test_double_decoder.py", line 3, in <module>
-    import cv2
-  File "/home/thiago/NAS_proj/.venv/lib/python3.11/site-packages/cv2/__init__.py", line 181, in <module>
-    bootstrap()
-  File "/home/thiago/NAS_proj/.venv/lib/python3.11/site-packages/cv2/__init__.py", line 153, in bootstrap
-    native_module = importlib.import_module("cv2")
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/conda/lib/python3.11/importlib/__init__.py", line 126, in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-ImportError: libGL.so.1: cannot open shared object file: No such file or directory
-(1110, 2) (370, 2)
-Dataset Size:
-Train: 1110 - Valid: 370
-
-Select device cuda
-Traceback (most recent call last):
-  File "/home/thiago/NAS_proj/main.py", line 164, in <module>
-    model(blocks, layers, skips, n_folds=5, albu_scale=4, alfa_loss=0.549962875, alfa_class=0.474814334, epochs=10)
-  File "/home/thiago/NAS_proj/main.py", line 54, in model
-    trainer = Trainer(train, validation, fold=i, scale=albu_scale, base_results=base_results, modelDict=modelDict)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/thiago/NAS_proj/train_double_decoder.py", line 39, in __init__
-    os.mkdir(f"{self.base_results}fold/fold_{self.fold}/pretrained_ckpt/")
-FileNotFoundError: [Errno 2] No such file or directory: '/backup/thiago.freire/results/NAS/fold/fold_0/pretrained_ckpt/'
+Treinando com 127 mini-batchs

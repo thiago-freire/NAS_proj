@@ -14,7 +14,7 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
           epochs = 35, n_folds = 5, albu_scale=1):
 
     lr = 1e-3
-    batch_size = 40
+    batch_size = 35
 
     modelDict = {'blocks':blocks,
                  'layers':layers,
@@ -151,16 +151,17 @@ def runOptuna():
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    # runOptuna()
+    os.environ['NO_ALBUMENTATIONS_UPDATE'] = '1'
+
+    runOptuna()
     # model(k = 2, batch_size = 20, epochs = 50,  
     #       n_folds = 5, albu_scale = 2, 
     #       alfa_loss = 0.61)
 
-    os.environ['NO_ALBUMENTATIONS_UPDATE'] = '1'
 
-    blocks = ['AT','AT','AT','C','NT','C','AT','NT']
-    layers = [5,5,5,5]
-    skips = [False, True, True, False]
+    # blocks = ['AT','AT','AT','C','NT','C','AT','NT']
+    # layers = [5,5,5,5]
+    # skips = [False, True, True, False]
             
-    model(blocks, layers, skips, n_folds=5, albu_scale=4, alfa_loss=0.549962875, alfa_class=0.474814334, epochs=10)
+    # model(blocks, layers, skips, n_folds=5, albu_scale=4, alfa_loss=0.549962875, alfa_class=0.474814334, epochs=10)
     
