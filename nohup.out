@@ -74,3 +74,31 @@ Estimated Total Size (MB): 11978.95
 Iniciando Treinamento...
 Iniciando época 1 de 35...
 Treinando com 153 mini-batchs
+Traceback (most recent call last):
+  File "/home/thiago/NAS_proj/main.py", line 4, in <module>
+    from test_double_decoder import Tester
+  File "/home/thiago/NAS_proj/test_double_decoder.py", line 3, in <module>
+    import cv2
+  File "/home/thiago/NAS_proj/.venv/lib/python3.11/site-packages/cv2/__init__.py", line 181, in <module>
+    bootstrap()
+  File "/home/thiago/NAS_proj/.venv/lib/python3.11/site-packages/cv2/__init__.py", line 153, in bootstrap
+    native_module = importlib.import_module("cv2")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.11/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ImportError: libGL.so.1: cannot open shared object file: No such file or directory
+(1110, 2) (370, 2)
+Dataset Size:
+Train: 1110 - Valid: 370
+
+Select device cuda
+Traceback (most recent call last):
+  File "/home/thiago/NAS_proj/main.py", line 164, in <module>
+    model(blocks, layers, skips, n_folds=5, albu_scale=4, alfa_loss=0.549962875, alfa_class=0.474814334, epochs=10)
+  File "/home/thiago/NAS_proj/main.py", line 54, in model
+    trainer = Trainer(train, validation, fold=i, scale=albu_scale, base_results=base_results, modelDict=modelDict)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/thiago/NAS_proj/train_double_decoder.py", line 39, in __init__
+    os.mkdir(f"{self.base_results}fold/fold_{self.fold}/pretrained_ckpt/")
+FileNotFoundError: [Errno 2] No such file or directory: '/backup/thiago.freire/results/NAS/fold/fold_0/pretrained_ckpt/'

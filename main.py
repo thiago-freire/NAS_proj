@@ -36,7 +36,7 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
     if not os.path.isdir(f"{base_results}fold/"):
         os.mkdir(f"{base_results}fold/")
 
-    origa_paths, refuge_paths = loadData(Refuge_path=refuge, Origa_path=origa)
+    # origa_paths, refuge_paths = loadData(Refuge_path=refuge, Origa_path=origa)
 
     if n_folds != 1:
 
@@ -49,7 +49,8 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
             validation = openHoldout(f"data_set/val_{i}.txt")
             # test = np.loadtxt(f"data_set/test_{i}.txt", delimiter=",")
 
-            print(train.shape, validation.shape)
+            if not os.path.isdir(f"{base_results}fold/fold_{i}/"):
+                os.mkdir(f"{base_results}fold/fold_{i}/")
 
             trainer = Trainer(train, validation, fold=i, scale=albu_scale, base_results=base_results, modelDict=modelDict)
             trainer.setHyperParam(lr=lr, batch_size=batch_size, epochs=epochs, 
@@ -98,12 +99,12 @@ def objective(trial: optuna.Trial) -> float:
         blocks.append(cate)
     blocks = np.concatenate((blocks, blocks[::-1]))
 
-    layers = [5,5,5,5]
+    layers = [3,4,4,3]
     # for i in range(4):
     #     layer = trial.suggest_int(f"layer_{i+1}", 2, 5)
     #     layers.append(layer)
     
-    skips = [False, False, False, False]
+    skips = [True, True, True, True]
     # for i in range(4):
     #     skip = trial.suggest_categorical(f"skip_{i+1}", [True, False])
     #     skips.append(skip)
@@ -132,7 +133,7 @@ def objective(trial: optuna.Trial) -> float:
 
 def runOptuna():
 
-    create = False
+    create = True
 
     if create:
         study = optuna.create_study(
@@ -145,7 +146,7 @@ def runOptuna():
             storage="postgresql://postgres:postgres@192.168.200.169/optuna",  # Specify the storage URL here.
             study_name="Optimização do Modelo")
     
-    study.optimize(objective, n_trials=100)
+    study.optimize(objective, n_trials=41)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
