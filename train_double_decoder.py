@@ -38,7 +38,7 @@ class Trainer():
         if not os.path.isdir(f"{self.base_results}fold/fold_{self.fold}/pretrained_ckpt/"):
             os.mkdir(f"{self.base_results}fold/fold_{self.fold}/pretrained_ckpt/")
 
-        self.checkpoint_path = f"{self.base_results}fold/fold_{self.fold}/pretrained_ckpt/res_unet.pth"
+        self.checkpoint_path = f"{self.base_results}fold/fold_{self.fold}/pretrained_ckpt/res_unet_gpu_0.pth"
 
         """ Dataset and loader """
         self.train_dataset = DriveDataset(train, scale)

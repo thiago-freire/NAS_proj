@@ -14,7 +14,7 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
           epochs = 35, n_folds = 5, albu_scale=1):
 
     lr = 1e-3
-    batch_size = 35
+    batch_size = 30
 
     modelDict = {'blocks':blocks,
                  'layers':layers,
@@ -133,7 +133,7 @@ def objective(trial: optuna.Trial) -> float:
 
 def runOptuna():
 
-    create = True
+    create = False
 
     if create:
         study = optuna.create_study(
