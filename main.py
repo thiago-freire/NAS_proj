@@ -36,8 +36,6 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
     if not os.path.isdir(f"{base_results}fold/"):
         os.mkdir(f"{base_results}fold/")
 
-    # origa_paths, refuge_paths = loadData(Refuge_path=refuge, Origa_path=origa)
-
     if n_folds != 1:
 
         dices = []
@@ -69,6 +67,8 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
     
     else: 
 
+        origa_paths, refuge_paths = loadData(Refuge_path=refuge, Origa_path=origa)
+
         if not os.path.isdir(f"{base_results}fold/fold_7"):
                 os.mkdir(f"{base_results}fold/fold_7")
         train = np.concatenate([origa_paths, refuge_paths], axis=0)
@@ -93,16 +93,16 @@ def objective(trial: optuna.Trial) -> float:
 
     alfa_class = 0.474814334 #trial.suggest_float("alfa_class", 0.3, 0.7)
 
-    blocks = []
-    for i in range(4):
-        cate = trial.suggest_categorical(f"step_{i+1}", ["AT", "NT", "C"])
-        blocks.append(cate)
-    blocks = np.concatenate((blocks, blocks[::-1]))
-
-    layers = [3,4,4,3]
+    blocks = ["AT", "AT", "C", "NT", "NT", "C", "AT", "AT"] # Obtido pelo Optuna.
     # for i in range(4):
-    #     layer = trial.suggest_int(f"layer_{i+1}", 2, 5)
-    #     layers.append(layer)
+    #     cate = trial.suggest_categorical(f"step_{i+1}", ["AT", "NT", "C"])
+    #     blocks.append(cate)
+    # blocks = np.concatenate((blocks, blocks[::-1]))
+
+    layers = []
+    for i in range(4):
+        layer = trial.suggest_int(f"layer_{i+1}", 2, 5)
+        layers.append(layer)
     
     skips = [True, True, True, True]
     # for i in range(4):

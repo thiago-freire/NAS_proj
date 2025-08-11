@@ -33,7 +33,7 @@ class Tester():
 
         """ Hyperparameters """
         if checkpoint_path == None:
-            self.checkpoint_path = f"{self.base_results}fold/fold_{self.fold}/pretrained_ckpt/res_unet_gpu_0.pth"
+            self.checkpoint_path = f"{self.base_results}fold/fold_{self.fold}/pretrained_ckpt/res_unet_gpu_1.pth"
         else:
             self.checkpoint_path = checkpoint_path
 
