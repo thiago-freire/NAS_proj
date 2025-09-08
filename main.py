@@ -99,15 +99,20 @@ def objective(trial: optuna.Trial) -> float:
     #     blocks.append(cate)
     # blocks = np.concatenate((blocks, blocks[::-1]))
 
-    layers = []
-    for i in range(4):
-        layer = trial.suggest_int(f"layer_{i+1}", 2, 5)
-        layers.append(layer)
-    
-    skips = [True, True, True, True]
+    # 0.9538957916035747, 0.8777849589995625
+    # layer_1 3
+    # layer_2 5
+    # layer_3 3
+    # layer_4 4
+    layers = [3,4,3,5]
     # for i in range(4):
-    #     skip = trial.suggest_categorical(f"skip_{i+1}", [True, False])
-    #     skips.append(skip)
+    #     layer = trial.suggest_int(f"layer_{i+1}", 2, 5)
+    #     layers.append(layer)
+    
+    skips = []
+    for i in range(4):
+        skip = trial.suggest_categorical(f"skip_{i+1}", [True, False])
+        skips.append(skip)
 
     dices = model(blocks, layers, skips, alfa_loss, alfa_class, epochs=35,
                   n_folds = 5, albu_scale = albu_scale)
@@ -138,15 +143,15 @@ def runOptuna():
     if create:
         study = optuna.create_study(
             # storage="postgresql://postgres:postgres@192.168.200.169/optuna_thiago",  # Specify the storage URL here.
-            storage="postgresql://postgres:postgres@192.168.200.169/optuna",  # Specify the storage URL here.
+            storage="postgresql://postgres:postgres@192.168.200.169/optuna_04",  # Specify the storage URL here.
             study_name="Optimização do Modelo",
             directions=["maximize", "maximize"])
     else:
         study = optuna.load_study(
-            storage="postgresql://postgres:postgres@192.168.200.169/optuna",  # Specify the storage URL here.
+            storage="postgresql://postgres:postgres@192.168.200.169/optuna_04",  # Specify the storage URL here.
             study_name="Optimização do Modelo")
     
-    study.optimize(objective, n_trials=41)
+    study.optimize(objective, n_trials=1)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -159,9 +164,9 @@ if __name__ == '__main__':
     #       alfa_loss = 0.61)
 
 
-    # blocks = ['AT','AT','AT','C','NT','C','AT','NT']
-    # layers = [5,5,5,5]
-    # skips = [False, True, True, False]
+    # blocks = ["AT", "AT", "C", "NT", "NT", "C", "AT", "AT"]
+    # layers = [3,4,3,5]
+    # skips = [True, True, True, True]
             
-    # model(blocks, layers, skips, n_folds=5, albu_scale=4, alfa_loss=0.549962875, alfa_class=0.474814334, epochs=10)
+    # model(blocks, layers, skips, n_folds=1, albu_scale=4, alfa_loss=0.549962875, alfa_class=0.474814334, epochs=1)
     
