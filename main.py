@@ -14,7 +14,7 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
           epochs = 35, n_folds = 5, albu_scale=1):
 
     lr = 1e-3
-    batch_size = 30
+    batch_size = 40
 
     modelDict = {'blocks':blocks,
                  'layers':layers,
@@ -45,7 +45,7 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
 
             train = openHoldout(f"data_set/train_{i}.txt")
             validation = openHoldout(f"data_set/val_{i}.txt")
-            # test = np.loadtxt(f"data_set/test_{i}.txt", delimiter=",")
+            test = openHoldout(f"data_set/test_{i}.txt")
 
             if not os.path.isdir(f"{base_results}fold/fold_{i}/"):
                 os.mkdir(f"{base_results}fold/fold_{i}/")
@@ -55,7 +55,7 @@ def model(blocks, layers, skips, alfa_loss = 0.5, alfa_class = 0.5,
                                   alfa_loss=alfa_loss, alfa_class=alfa_class)
             trainer.run()
 
-            tester = Tester(validation, fold=i, base_results=base_results, modelDict=modelDict)
+            tester = Tester(test, fold=i, base_results=base_results, modelDict=modelDict)
             dices.append(tester.run())
 
             end_time = time.time()
@@ -158,15 +158,15 @@ if __name__ == '__main__':
 
     os.environ['NO_ALBUMENTATIONS_UPDATE'] = '1'
 
-    runOptuna()
+    # runOptuna()
     # model(k = 2, batch_size = 20, epochs = 50,  
     #       n_folds = 5, albu_scale = 2, 
     #       alfa_loss = 0.61)
 
 
-    # blocks = ["AT", "AT", "C", "NT", "NT", "C", "AT", "AT"]
-    # layers = [3,4,3,5]
-    # skips = [True, True, True, True]
+    blocks = ["AT", "AT", "C", "NT", "NT", "C", "AT", "AT"]
+    layers = [3,4,3,5]
+    skips = [True, True, True, False]
             
-    # model(blocks, layers, skips, n_folds=1, albu_scale=4, alfa_loss=0.549962875, alfa_class=0.474814334, epochs=1)
+    model(blocks, layers, skips, n_folds=5, albu_scale=4, alfa_loss=0.549962875, alfa_class=0.474814334, epochs=100)
     
