@@ -95,10 +95,9 @@ def objective(trial: optuna.Trial) -> float:
 
     # blocks = ["AT", "AT", "C", "NT", "NT", "C", "AT", "AT"] # Obtido pelo Optuna.
     blocks = []
-    for i in range(4):
+    for i in range(8):
         cate = trial.suggest_categorical(f"step_{i+1}", ["AT", "NT", "C"])
         blocks.append(cate)
-    blocks = np.concatenate((blocks, blocks[::-1]))
 
     # 0.9538957916035747, 0.8777849589995625
     # layer_1 3
@@ -145,6 +144,8 @@ def runOptuna():
         study_name="Optimização do Modelo",
         directions=["maximize", "minimize", "maximize", "minimize"]
     )
+
+    # optuna-dashboard postgresql://postgres:postgres@192.168.200.169/optuna
 
     study.optimize(objective, n_trials=10)
 
